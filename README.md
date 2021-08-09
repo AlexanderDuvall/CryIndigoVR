@@ -1,7 +1,9 @@
 # CryIndigoVR
 This will House the Code for Cryengine VR. I do not own anything CryEngine related. Only the component code provided was developed by IndigoAffect LLC. 
 
-To get started download the project as a zip file. Unzip both the repository and CRYENGINE-VRUpdated
+To get started download the project as a zip file and unzip it. 
+
+Also Download the Custom VR CryEngine from OneDrive. [In the future it will be on GitHub too](https://1drv.ms/u/s!Ah4k-gNkBMHTjahUQF-R2edxQf10nA?e=sqilQb):  
 
 Once this is done follow the Oculus tutorial on Youtube! 
 
