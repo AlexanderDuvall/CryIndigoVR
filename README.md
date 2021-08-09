@@ -3,7 +3,9 @@ This will House the Code for Cryengine VR. I do not own anything CryEngine relat
 
 To get started download the project as a zip file. Unzip both the repository and CRYENGINE-VRUpdated
 
-Once this is done follow the Oculus tutorial on Youtube!
+Once this is done follow the Oculus tutorial on Youtube! 
+
+There will be an OpenVR and Flowgraph tutorial in the coming days!
 
 
 
