@@ -11,7 +11,7 @@ There will be an OpenVR and Flowgraph tutorial in the coming days!
 
 
 
-[![](https://img.youtube.com/vi/bjGy9dkAY5U/0.jpg)](https://www.youtube.com/watch?v=bjGy9dkAY5U)
+[![](https://img.youtube.com/vi/U-Syyg2ufM8/0.jpg)](https://www.youtube.com/watch?v=U-Syyg2ufM8)
 
 
 ------------------------DISCLAIMER----------------------DISCLAIMER------------------
