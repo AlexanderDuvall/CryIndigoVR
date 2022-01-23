@@ -18,7 +18,7 @@ Video Below!
 The necessary files are zipped up on GitHub as "CryEngine Community."
 
 Video Below
-https://github.com/AlexanderDuvall/CryIndigoVR
+
 [![](https://img.youtube.com/vi/KW1lDQ1MiV8/0.jpg)](https://www.youtube.com/watch?v=KW1lDQ1MiV8)
 
 ------------------------DISCLAIMER----------------------DISCLAIMER------------------
