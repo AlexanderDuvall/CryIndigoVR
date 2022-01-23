@@ -3,7 +3,7 @@
 #include <DefaultComponents/Audio/ListenerComponent.h>
 class VRMovementComponent : public IEntityComponent
 {
- public:
+public:
 	VRMovementComponent() {};
 	~VRMovementComponent() {};
 	static float leftTrigger;
@@ -23,7 +23,8 @@ class VRMovementComponent : public IEntityComponent
 	virtual void ProcessEvent(const SEntityEvent& event) override;
 	virtual Cry::Entity::EventFlags GetEventMask() const override;
 	Cry::Audio::DefaultComponents::CListenerComponent* m_pAudioListenerComponent = nullptr;
-
+	static Vec3 largeCollider;
+	static Vec3 smallCollider;
 	float m_speed = 1.0F;
 	CCamera mainCamera;
 private:

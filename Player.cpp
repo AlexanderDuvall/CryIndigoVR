@@ -357,12 +357,37 @@ void CPlayerComponent::UpdateCamera(float frameTime)
 
 void CPlayerComponent::OnReadyForGameplayOnServer()
 {
+	CRY_ASSERT(gEnv->bServer, "This function should only be called on the server!");
 
+	const Matrix34 newTransform = CSpawnPointComponent::GetFirstSpawnPointTransform();
+
+	Revive(newTransform);
+
+	// Invoke the RemoteReviveOnClient function on all remote clients, to ensure that Revive is called across the network
+	SRmi<RMI_WRAP(&CPlayerComponent::RemoteReviveOnClient)>::InvokeOnOtherClients(this, RemoteReviveParams{ newTransform.GetTranslation(), Quat(newTransform) });
+
+	// Go through all other players, and send the RemoteReviveOnClient on their instances to the new player that is ready for gameplay
+	const int channelId = m_pEntity->GetNetEntity()->GetChannelId();
+	CGamePlugin::GetInstance()->IterateOverPlayers([this, channelId](CPlayerComponent& player)
+	{
+		// Don't send the event for the player itself (handled in the RemoteReviveOnClient event above sent to all clients)
+		if (player.GetEntityId() == GetEntityId())
+			return;
+
+		// Only send the Revive event to players that have already respawned on the server
+		if (!player.m_isAlive)
+			return;
+
+		// Revive this player on the new player's machine, on the location the existing player was currently at
+		const QuatT currentOrientation = QuatT(player.GetEntity()->GetWorldTM());
+		SRmi<RMI_WRAP(&CPlayerComponent::RemoteReviveOnClient)>::InvokeOnClient(&player, RemoteReviveParams{ currentOrientation.t, currentOrientation.q }, channelId);
+	});
 }
 
 bool CPlayerComponent::RemoteReviveOnClient(RemoteReviveParams&& params, INetChannel* pNetChannel)
 {
 	// Call the Revive function on this client
+	Revive(Matrix34::Create(Vec3(1.f), params.rotation, params.position));
 
 	return true;
 }

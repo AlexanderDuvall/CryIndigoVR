@@ -22,8 +22,8 @@
 #include "VRMath.h"
 #include <CryMath/Cry_Matrix34.h>
 #include <CryPhysics/physinterface.h>
- 
-	//PLACE IN CORRECT SPOT ... INITIALIZE?
+
+//PLACE IN CORRECT SPOT ... INITIALIZE?
 struct Point {
 	double x;
 	double y;
@@ -38,7 +38,7 @@ static void RegisterPauseMenuComponent(Schematyc::IEnvRegistrar& registrar)
 		Schematyc::CEnvRegistrationScope componentScope = scope.Register(SCHEMATYC_MAKE_ENV_COMPONENT(PauseMenuController));
 		// Functions	
 		{
-			
+
 		}
 	}
 }
@@ -46,17 +46,23 @@ CRY_STATIC_AUTO_REGISTER_FUNCTION(&RegisterPauseMenuComponent)
 //asdf
 
 void PauseMenuController::Initialize() {
-	Cry::DefaultComponents::CRigidBodyComponent* rigid = m_pEntity->GetOrCreateComponent <Cry::DefaultComponents::CRigidBodyComponent>();
-	righthand = rigid->GetEntity();
+	//Cry::DefaultComponents::CRigidBodyComponent* rigid = m_pEntity->GetOrCreateComponent <Cry::DefaultComponents::CRigidBodyComponent>();
+	//righthand = rigid->GetEntity();
 }
 void PauseMenuController::ProcessEvent(const SEntityEvent& event) {
 	mainBody = gEnv->pEntitySystem->FindEntityByName("HMD Cam");
 	settingsMenu = gEnv->pEntitySystem->FindEntityByName("UI Settings");
 	mainMenu = gEnv->pEntitySystem->FindEntityByName("UI PlaneBase");
+	confirmMenu = gEnv->pEntitySystem->FindEntityByName("UI Confirm");
+	InformationMenu = gEnv->pEntitySystem->FindEntityByName("UI Information");
+	LevelsMenu = gEnv->pEntitySystem->FindEntityByName("UI Levels");
+
 	backgroundPanel = gEnv->pEntitySystem->FindEntityByName("BackgroundPanelMain");
 	uiBall = gEnv->pEntitySystem->FindEntityByName("UI_BALL");
 	ICVar* mainMenuVar = gEnv->pConsole->GetCVar("ui_showMainMenu"); // will be 1 if showing.
 	ICVar* settingsVar = gEnv->pConsole->GetCVar("ui_showSettings"); // will be 1 if showing.
+	//ICVar* informationVar = gEnv->pConsole->GetCVar("ui_showInformation "); // will be 1 if showing.
+	//ICVar* confirmVar = gEnv->pConsole->GetCVar("ui_showConfirm"); // will be 1 if showing.
 	ICVar* openingSceneVar = gEnv->pConsole->GetCVar("ui_isOpeningScene");
 	if (event.event == ENTITY_EVENT_UPDATE)
 	{
@@ -65,9 +71,9 @@ void PauseMenuController::ProcessEvent(const SEntityEvent& event) {
 			if (IHmdDevice* pDevice = pHmdManager->GetHmdDevice()) // Check, if a valid HMD device is connected
 			{
 				issteam = pDevice->GetClass() == EHmdClass::eHmdClass_OpenVR;
-				
+
 				const IHmdController* pController = pDevice->GetController();
-				
+
 				auto controllertypeLeft = issteam ? eHmdController_OpenVR_1 : eHmdController_OculusLeftHand;
 				auto controllertypeRight = issteam ? eHmdController_OpenVR_2 : eHmdController_OculusRightHand;
 				auto controllerButtonLeft = issteam ? eKI_Motion_OpenVR_ApplicationMenu : static_cast<EKeyId>(controllertypeLeft + eKI_Motion_OculusTouch_Y);
@@ -76,7 +82,7 @@ void PauseMenuController::ProcessEvent(const SEntityEvent& event) {
 				if (pController->IsConnected(controllertypeLeft) || pController->IsConnected(controllertypeRight))
 				{
 					bool bAppMenuPressed = pController->IsButtonPressed(controllertypeLeft, controllerButtonLeft) || pController->IsButtonPressed(controllertypeRight, controllerButtonRight);
- 					if (bAppMenuPressed == false) {
+					if (bAppMenuPressed == false) {
 						alreadyLogged = false;
 					}
 					if (openingSceneVar->GetIVal() == 1) {
@@ -86,7 +92,7 @@ void PauseMenuController::ProcessEvent(const SEntityEvent& event) {
 
 					if (bAppMenuPressed && !alreadyLogged && !PauseMenuController::paused && openingSceneVar->GetIVal() == 0) {
 						pDevice->RecenterPose();
- 						Matrix34 local = mainMenu->GetLocalTM();
+						Matrix34 local = mainMenu->GetLocalTM();
 						Matrix34 backLocal = backgroundPanel->GetLocalTM();
 						local.SetTranslation(Vec3(xPos, yPos, zPos));
 						backLocal.SetTranslation(Vec3(xPos + backgroundPanelX, yPos + backgroundPanelY, zPos + backgroundPanelZ));
@@ -98,6 +104,7 @@ void PauseMenuController::ProcessEvent(const SEntityEvent& event) {
 						settingsVar->Set(0);
 						if (uiBall)
 							uiBall->Hide(false);
+						CryLog("OpeningScene...");
 					}
 					//hide main menu
 					else if ((bAppMenuPressed && !alreadyLogged && PauseMenuController::paused && openingSceneVar->GetIVal() == 0) || forceHide && openingSceneVar->GetIVal() == 0) {
@@ -122,6 +129,7 @@ void PauseMenuController::ProcessEvent(const SEntityEvent& event) {
 						forceHide = false;
 						if (uiBall)
 							uiBall->Hide(true);
+						CryLog("Hiding menu if");
 					}
 					else {
 						PauseMenuController::checkMenuStatus();
@@ -139,23 +147,115 @@ Check the Menu status and bring it up as demanded from the sandbox.
 void PauseMenuController::checkMenuStatus() {
 	ICVar* mainMenuVar = gEnv->pConsole->GetCVar("ui_showMainMenu"); // will be 1 if showing.
 	ICVar* settingsVar = gEnv->pConsole->GetCVar("ui_showSettings");
-	if (PauseMenuController::paused && settingsVar->GetIVal() == 1 && !PauseMenuController::settingsVisible) {
-		PauseMenuController::settingsVisible = true;
-		///bring up settings.
-		Matrix34 local = settingsMenu->GetLocalTM();
-		Matrix34 localMain = settingsMenu->GetLocalTM();
+	ICVar* levelsVar = gEnv->pConsole->GetCVar("ui_showLevels");
+	ICVar* informationVar = gEnv->pConsole->GetCVar("ui_showInformation"); // will be 1 if showing.
+	ICVar* confirmVar = gEnv->pConsole->GetCVar("ui_showConfirm"); // will be 1 if showing.
+	if (PauseMenuController::paused && settingsVar->GetIVal() == 1) {
+		if (isInfoVisible && informationVar->GetIVal() == 0) {
+			//back to the beginning ------------------
+			Matrix34 local = confirmMenu->GetLocalTM();
+			local.SetTranslation(Vec3(1, 1, -10.8));
+			confirmMenu->SetLocalTM(local);
+			InformationMenu->SetLocalTM(local);
+			settingsMenu->SetLocalTM(local);
+
+			settingsVar->Set(0);
+			informationVar->Set(0);
+			confirmVar->Set(0);
+			//pull up main menu ----------------------
+			local = InformationMenu->GetLocalTM();
+			local.SetTranslation(Vec3(xPos, yPos, zPos));
+			mainMenu->SetLocalTM(local);
+			isInfoVisible = false;
+			CryLog("Back to Begnning");
+		}
+		else if (!isInfoVisible && informationVar->GetIVal() == 1) { //check if information menu was requested
+			CryLog("Information Requested");
+			//hiding confirm
+			Matrix34 local = confirmMenu->GetLocalTM();
+			local.SetTranslation(Vec3(1, 1, -10.8));
+			confirmMenu->SetLocalTM(local);
+			//------------------------------------------------------------------ show information menu
+			local = InformationMenu->GetLocalTM();
+			local.SetTranslation(Vec3(xPos, yPos, zPos));
+			InformationMenu->SetLocalTM(local);
+			isInfoVisible = true;
+
+		}
+		else if (confirmVar->GetIVal() == 1 && !isConfirming && PauseMenuController::settingsVisible) {//check if confirm menu was requested
+			CryLog("Confirm requested");
+			isConfirming = true;
+			//place confirm menu and hide settings menu.
+			//hiding settings
+			Matrix34 local = settingsMenu->GetLocalTM();
+			local.SetTranslation(Vec3(1, 1, -10.8));
+			settingsMenu->SetLocalTM(local);
+			//------------------------------------------------------------------ show confirm menu
+			local = confirmMenu->GetLocalTM();
+			local.SetTranslation(Vec3(xPos, yPos, zPos));
+			confirmMenu->SetLocalTM(local);
+		}
+		else if (confirmVar->GetIVal() == 0 && settingsVisible && isConfirming) {
+			CryLog("Hiding Confirm and Bringing up Settings");
+			isConfirming = false;
+			//hide confirm and bring up settings
+			//---------------- hide confirm
+			Matrix34 local = settingsMenu->GetLocalTM();
+			local.SetTranslation(Vec3(1, 1, -10.8));
+			confirmMenu->SetLocalTM(local);
+			//--------------- show settings
+			local = confirmMenu->GetLocalTM();
+			local.SetTranslation(Vec3(xPos, yPos, zPos));
+			settingsMenu->SetLocalTM(local);
+		}
+		else if (settingsVar->GetIVal() == 1 && !settingsVisible) {///bring up settings.
+			PauseMenuController::settingsVisible = true;
+			Matrix34 local = settingsMenu->GetLocalTM();
+			Matrix34 localMain = settingsMenu->GetLocalTM();
+			//Matrix34 backLocalMain = backgroundPanel->GetLocalTM();
+			localMain.SetTranslation(Vec3(1, 1, -10.8));
+			//backLocalMain.SetTranslation(Vec3(1, 1, -10.8));
+			local.SetTranslation(Vec3(xPos, yPos, zPos));
+			mainMenu->SetLocalTM(localMain);
+			settingsMenu->SetLocalTM(local);
+			mainMenuVar->Set(1);
+			settingsVar->Set(1);
+			PauseMenuController::paused = true;
+			isConfirming = false;
+			CryLog("Bringing Up Settings");
+		}
+	}
+	else if (!levelsVisible && paused && levelsVar->GetIVal() == 1 && LevelsMenu) { // show levels menu
+		PauseMenuController::levelsVisible = true;
+		Matrix34 local = LevelsMenu->GetLocalTM();
+		Matrix34 localMain = LevelsMenu->GetLocalTM();
 		//Matrix34 backLocalMain = backgroundPanel->GetLocalTM();
 		localMain.SetTranslation(Vec3(1, 1, -10.8));
 		//backLocalMain.SetTranslation(Vec3(1, 1, -10.8));
 		local.SetTranslation(Vec3(xPos, yPos, zPos));
 		mainMenu->SetLocalTM(localMain);
-		settingsMenu->SetLocalTM(local);
-		mainMenuVar->Set(1);
-		settingsVar->Set(1);
+		LevelsMenu->SetLocalTM(local);
+		//mainMenuVar->Set(1);
+		levelsVar->Set(1);
 		PauseMenuController::paused = true;
+		levelsVisible = true;
+		CryLog("Bringing Up Levels");
 	}
-	else if (PauseMenuController::paused && settingsVar->GetIVal() == 0 && PauseMenuController::settingsVisible) {
-		//remove settings menu.
+	else if (paused && levelsVar->GetIVal() == 0 && levelsVisible && LevelsMenu) { //closes levels var if paused and cvar is 0.
+		PauseMenuController::settingsVisible = false;
+		Matrix34 local = LevelsMenu->GetLocalTM();
+		Matrix34 localMain = mainMenu->GetLocalTM();
+		localMain.SetTranslation(Vec3(xPos, yPos, zPos));
+		local.SetTranslation(Vec3(1, 1, -10.8));
+		mainMenu->SetLocalTM(localMain);
+		LevelsMenu->SetLocalTM(local);
+		levelsVar->Set(0);
+		PauseMenuController::paused = true;
+		levelsVisible = false;
+		CryLog("closing levels Var");
+	}
+	else if (PauseMenuController::paused && settingsVar->GetIVal() == 0 && PauseMenuController::settingsVisible) {		//remove settings menu.
+
 		PauseMenuController::settingsVisible = false;
 		Matrix34 local = settingsMenu->GetLocalTM();
 		Matrix34 localMain = mainMenu->GetLocalTM();
@@ -165,6 +265,7 @@ void PauseMenuController::checkMenuStatus() {
 		settingsMenu->SetLocalTM(local);
 		settingsVar->Set(0);
 		PauseMenuController::paused = true;
+		CryLog("Removing Settings");
 	}
 	else if (paused && mainMenuVar->GetIVal() == 0)
 	{
@@ -173,8 +274,8 @@ void PauseMenuController::checkMenuStatus() {
 		forceHide = true;
 		PauseMenuController::paused = true;
 		settingsVar->Set(0);
+		//CryLog("Hiding Variable");
 	}
-
 }
 Cry::Entity::EventFlags PauseMenuController::GetEventMask() const {
 	return (ENTITY_EVENT_UPDATE);

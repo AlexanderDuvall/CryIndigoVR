@@ -5,6 +5,7 @@ class LeftHandInteraction : public IEntityComponent
 {
 
 public:
+	static int counter;
 	static bool grabbed;
 	static IEntity* currentChild;
 	static IEntity* LeftHandEntity;
@@ -23,5 +24,12 @@ public:
 	virtual void Initialize() override;
 	virtual void ProcessEvent(const SEntityEvent& event) override;
 	virtual Cry::Entity::EventFlags GetEventMask() const override;
+private:
+	std::map<EntityId, IEntity*> nearHand;
+	Vec3 closest;
+	virtual EntityId getNearestObject(std::map<EntityId, IEntity*>, IEntity*);
+	static bool isMinimized;
+	virtual bool getColliderStatus();
+	virtual bool setColliderStatus(bool);
 };
 

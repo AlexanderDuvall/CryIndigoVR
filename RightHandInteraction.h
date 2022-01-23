@@ -4,8 +4,8 @@
 class RightHandInteraction : public IEntityComponent
 {
 
-
 public:
+	static int counter;
 	static bool grabbedx;
 	static IEntity* currentChildx;
 	static IEntity* RightHandEntityx;
@@ -21,10 +21,16 @@ public:
 		desc.SetLabel("Right Hand Interaction");
 		desc.SetDescription("Add object interaction to for the right hand. Component must be put on a child of the hand. \n The tracking box will be wherever the child is.");
 	}
-	//void RightHandInteraction::PhysicalizeChild(IEntity*);
 	virtual void Initialize() override;
- 	virtual void ProcessEvent(const SEntityEvent& event) override;
+	virtual void ProcessEvent(const SEntityEvent& event) override;
 	virtual Cry::Entity::EventFlags GetEventMask() const override;
+
 private:
+	std::map<EntityId, IEntity*> nearHand;
+	Vec3 closest;
+	virtual EntityId getNearestObject(std::map<EntityId, IEntity*>, IEntity*);
+	static bool isMinimized;
+	virtual bool getColliderStatus();
+	virtual bool setColliderStatus(bool);
 };
 

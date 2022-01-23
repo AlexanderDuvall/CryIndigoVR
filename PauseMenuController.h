@@ -51,9 +51,16 @@ private:
 	bool forceHide = false;
 	bool alreadyLogged = false;
 	bool settingsVisible = false;
+	bool isConfirming = false;
+	bool isInfoVisible = false;
+	bool levelsVisible = false;
 	IEntity* laser;
 	IEntity* settingsMenu;
 	IEntity* mainMenu;
+	IEntity* confirmMenu;
+	IEntity* InformationMenu;
+	IEntity* LevelsMenu;
+
 	const uint32 queryFlags = ent_all;
 	const uint32 rayFlags = rwi_stop_at_pierceable;
 };

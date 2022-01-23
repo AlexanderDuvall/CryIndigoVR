@@ -79,42 +79,42 @@ static void RegisterVRLeftControllerComponent(Schematyc::IEnvRegistrar& registra
 }
 CRY_STATIC_AUTO_REGISTER_FUNCTION(&RegisterVRLeftControllerComponent)
 void VRLeftController::resetAnimation() {
-	m_pAnimationComponent = m_pEntity->GetOrCreateComponent<Cry::DefaultComponents::CAdvancedAnimationComponent>();
-	m_pAnimationComponent->SetMannequinAnimationDatabaseFile("Animations/Mannequin/ADB/vrlefthand.adb");
-	m_pAnimationComponent->SetCharacterFile("characters/Hands/left_glove/scifi_L_animated_.cdf");
-	m_pAnimationComponent->SetControllerDefinitionFile("Animations/Mannequin/ADB/FirstPersonControllerDefinition.xml");
-	m_pAnimationComponent->SetDefaultScopeContextName("FirstPersonCharacter");
-	// Disable movement coming from the animation (root joint offset), we control this entirely via physics
-	m_pAnimationComponent->SetAnimationDrivenMotion(true);
-	// Load the character and Mannequin data from file
-	m_pAnimationComponent->LoadFromDisk();
-	// Acquire fragment and tag identifiers to avoid doing so each update
-	idle = m_pAnimationComponent->GetFragmentId("Idle");
-	point = m_pAnimationComponent->GetFragmentId("Point");
-	pointStable = m_pAnimationComponent->GetFragmentId("PointStable");
-	grab = m_pAnimationComponent->GetFragmentId("Grab");
-	grabStable = m_pAnimationComponent->GetFragmentId("GrabStable");
-	fistStable = m_pAnimationComponent->GetFragmentId("FistStable");
-	fist = m_pAnimationComponent->GetFragmentId("Fist");
-	transition = m_pAnimationComponent->GetFragmentId("Transition");
-	ImpulseScalar = 0.0;
-
-	fistAction = new TAction<SAnimationContext>(2, fist);
-	fistStableAction = new TAction<SAnimationContext>(2, fistStable);
-
-	tranAction = new TAction<SAnimationContext>(2, transition);
-
-	pointAction = new TAction<SAnimationContext>(2, point);
-	pointStableAction = new TAction<SAnimationContext>(2, pointStable);
-
-	grabAction = new TAction<SAnimationContext>(2, grab);
-	grabStableAction = new TAction<SAnimationContext>(2, grabStable);
-
-	idleAction = new TAction<SAnimationContext>(2, idle);
-	mAction = m_pAnimationComponent->GetActionController();
-	//mAction->Queue(*idleAction);
-	m_pAnimationComponent->ResetCharacter();
-	m_pAnimationComponent->QueueFragmentWithId(idle);
+	//m_pAnimationComponent = m_pEntity->GetOrCreateComponent<Cry::DefaultComponents::CAdvancedAnimationComponent>();
+	//m_pAnimationComponent->SetMannequinAnimationDatabaseFile("Animations/Mannequin/ADB/vrlefthand.adb");
+	//m_pAnimationComponent->SetCharacterFile("characters/Hands/left_glove/scifi_L_animated_.cdf");
+	//m_pAnimationComponent->SetControllerDefinitionFile("Animations/Mannequin/ADB/FirstPersonControllerDefinition.xml");
+	//m_pAnimationComponent->SetDefaultScopeContextName("FirstPersonCharacter");
+	//// Disable movement coming from the animation (root joint offset), we control this entirely via physics
+	//m_pAnimationComponent->SetAnimationDrivenMotion(true);
+	//// Load the character and Mannequin data from file
+	//m_pAnimationComponent->LoadFromDisk();
+	//// Acquire fragment and tag identifiers to avoid doing so each update
+	//idle = m_pAnimationComponent->GetFragmentId("Idle");
+	//point = m_pAnimationComponent->GetFragmentId("Point");
+	//pointStable = m_pAnimationComponent->GetFragmentId("PointStable");
+	//grab = m_pAnimationComponent->GetFragmentId("Grab");
+	//grabStable = m_pAnimationComponent->GetFragmentId("GrabStable");
+	//fistStable = m_pAnimationComponent->GetFragmentId("FistStable");
+	//fist = m_pAnimationComponent->GetFragmentId("Fist");
+	//transition = m_pAnimationComponent->GetFragmentId("Transition");
+	//ImpulseScalar = 0.0;
+	//
+	//fistAction = new TAction<SAnimationContext>(2, fist);
+	//fistStableAction = new TAction<SAnimationContext>(2, fistStable);
+	//
+	//tranAction = new TAction<SAnimationContext>(2, transition);
+	//
+	//pointAction = new TAction<SAnimationContext>(2, point);
+	//pointStableAction = new TAction<SAnimationContext>(2, pointStable);
+	//
+	//grabAction = new TAction<SAnimationContext>(2, grab);
+	//grabStableAction = new TAction<SAnimationContext>(2, grabStable);
+	//
+	//idleAction = new TAction<SAnimationContext>(2, idle);
+	//mAction = m_pAnimationComponent->GetActionController();
+	////mAction->Queue(*idleAction);
+	//m_pAnimationComponent->ResetCharacter();
+	//m_pAnimationComponent->QueueFragmentWithId(idle);
 	isIdle = true;
 }
 void VRLeftController::Initialize() {
@@ -138,7 +138,7 @@ void VRLeftController::MoveLiving(IPhysicalEntity& physicalEntity, Matrix34 worl
 	// Apply movement request directly to velocity
 	move.iJump = 1;	// Apply the impulse one unit upwards
 	// This can be combined with pe_action_impulse::point to apply the impulse on a specific point
-	move.dir = Vec3(world.GetTranslation().x, world.GetTranslation().y, world.GetTranslation().z * 1.2f) * 20.0f;
+	move.dir = Vec3(world.GetTranslation().x, world.GetTranslation().y, world.GetTranslation().z * 1.2f) * 30.0f;
 	// Apply the impulse on the entity
 	physicalEntity.Action(&move, 1);
 }
@@ -189,74 +189,74 @@ void VRLeftController::ProcessEvent(const SEntityEvent& event) {
 					//CryLog("isFist: "+ToString(isFist));
 					//CryLog("isPointing: "+ToString(isPointing));
 					//CryLog("PauseMenu: " + ToString(PauseMenuController::paused));
-					if (LeftHandInteraction::grabbed) {
-						isFist = false;
-						isPointing = false;
-						if ((!leftGeneralGrabEnd && leftHoldGrabEnd) || (leftGeneralGrabEnd && !stable)) {
-							m_pAnimationComponent->QueueCustomFragment(*grabStableAction);
-							isIdle = false;
-							stable = true;
-							isGrabbed = true;
-						}
-						else if (!isGrabbed) {
-							//mAction->Queue(*grabAction);
-							//m_pAnimationComponent->ResetCharacter();
-							m_pAnimationComponent->QueueCustomFragment(*grabAction);
-							stable = false;
-							isIdle = false;
-							isGrabbed = true;
-						}
-					}
-					else if (((bGripPressed && trigger && !isFist) || (isFist && (leftHoldFistEnd || leftGeneralFistEnd))) && !PauseMenuController::paused) {
-
-						if ((!leftGeneralFistEnd && leftHoldFistEnd) || (leftGeneralFistEnd && !stable)) {
-							m_pAnimationComponent->QueueCustomFragment(*fistStableAction);
-							isIdle = false;
-							stable = true;
-							CryLog("FistSTable");
-						}
-						else if (!leftGeneralFistEnd && !leftHoldFistEnd) {
-							//mAction->Queue(*fistAction);
-							//m_pAnimationComponent->ResetCharacter();
-
-							m_pAnimationComponent->QueueCustomFragment(*fistAction);
-							stable = false;
-							isIdle = false;
-						}
-						isFist = true;
-						isPointing = false;
-					}
-					else if ((bGripPressed && !trigger && !isPointing) || (isPointing && (leftHoldPointEnd || leftGeneralPointEnd))) {
-						//repeats										//stabilizes
-						if ((!leftGeneralPointEnd && leftHoldPointEnd) || (leftGeneralPointEnd && !stable) || PauseMenuController::paused) {
-							//mAction->Queue(*pointStableAction);
-							m_pAnimationComponent->QueueCustomFragment(*pointStableAction);
-							isIdle = false;
-							stable = true;
-						}
-						else if (!leftGeneralPointEnd && !leftGeneralFistEnd) {
-							//mAction->Queue(*pointAction);
-							//m_pAnimationComponent->ResetCharacter();
-
-							m_pAnimationComponent->QueueCustomFragment(*pointAction);
-							isIdle = false;
-							stable = false;
-						}
-						isFist = false;
-						isPointing = true;
-					}
-					else if (!bGripPressed && (isPointing || isFist || stable || isGrabbed || holdend || generalEnd) && !isIdle) {
-						isPointing = false;
-						stable = false;
-						isFist = false;
-						isGrabbed = false;
-						//mAction->Queue(*idleAction);
-						//reset hand
-						//m_pAnimationComponent->ResetCharacter();
-						m_pAnimationComponent->QueueFragmentWithId(idle);
-						//m_pAnimationComponent->QueueCustomFragment(*idleAction);
-						isIdle = true;
-					}
+					//if (LeftHandInteraction::grabbed) {
+					//	isFist = false;
+					//	isPointing = false;
+					//	if ((!leftGeneralGrabEnd && leftHoldGrabEnd) || (leftGeneralGrabEnd && !stable)) {
+					//		m_pAnimationComponent->QueueCustomFragment(*grabStableAction);
+					//		isIdle = false;
+					//		stable = true;
+					//		isGrabbed = true;
+					//	}
+					//	else if (!isGrabbed) {
+					//		//mAction->Queue(*grabAction);
+					//		//m_pAnimationComponent->ResetCharacter();
+					//		m_pAnimationComponent->QueueCustomFragment(*grabAction);
+					//		stable = false;
+					//		isIdle = false;
+					//		isGrabbed = true;
+					//	}
+					//}
+					//else if (((bGripPressed && trigger && !isFist) || (isFist && (leftHoldFistEnd || leftGeneralFistEnd))) && !PauseMenuController::paused) {
+					//
+					//	if ((!leftGeneralFistEnd && leftHoldFistEnd) || (leftGeneralFistEnd && !stable)) {
+					//		m_pAnimationComponent->QueueCustomFragment(*fistStableAction);
+					//		isIdle = false;
+					//		stable = true;
+					//		CryLog("FistSTable");
+					//	}
+					//	else if (!leftGeneralFistEnd && !leftHoldFistEnd) {
+					//		//mAction->Queue(*fistAction);
+					//		//m_pAnimationComponent->ResetCharacter();
+					//
+					//		m_pAnimationComponent->QueueCustomFragment(*fistAction);
+					//		stable = false;
+					//		isIdle = false;
+					//	}
+					//	isFist = true;
+					//	isPointing = false;
+					//}
+					//else if ((bGripPressed && !trigger && !isPointing) || (isPointing && (leftHoldPointEnd || leftGeneralPointEnd))) {
+					//	//repeats										//stabilizes
+					//	if ((!leftGeneralPointEnd && leftHoldPointEnd) || (leftGeneralPointEnd && !stable) || PauseMenuController::paused) {
+					//		//mAction->Queue(*pointStableAction);
+					//		m_pAnimationComponent->QueueCustomFragment(*pointStableAction);
+					//		isIdle = false;
+					//		stable = true;
+					//	}
+					//	else if (!leftGeneralPointEnd && !leftGeneralFistEnd) {
+					//		//mAction->Queue(*pointAction);
+					//		//m_pAnimationComponent->ResetCharacter();
+					//
+					//		m_pAnimationComponent->QueueCustomFragment(*pointAction);
+					//		isIdle = false;
+					//		stable = false;
+					//	}
+					//	isFist = false;
+					//	isPointing = true;
+					//}
+					//else if (!bGripPressed && (isPointing || isFist || stable || isGrabbed || holdend || generalEnd) && !isIdle) {
+					//	isPointing = false;
+					//	stable = false;
+					//	isFist = false;
+					//	isGrabbed = false;
+					//	//mAction->Queue(*idleAction);
+					//	//reset hand
+					//	//m_pAnimationComponent->ResetCharacter();
+					//	m_pAnimationComponent->QueueFragmentWithId(idle);
+					//	//m_pAnimationComponent->QueueCustomFragment(*idleAction);
+					//	isIdle = true;
+					//}
 					IEntity* body = gEnv->pEntitySystem->FindEntityByName("HMD Cam");
 					// Get the current tracking state
 					HmdTrackingState cState = pController->GetLocalTrackingState(eHmdController_OpenVR_1);

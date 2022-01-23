@@ -43,27 +43,27 @@ public:
 	void MoveLiving(IPhysicalEntity&, Matrix34);
 	static Ang3 getAngles();
 private:
-	bool isPointing = false;
-	bool isFist = false;
-	bool isGrabbed = false;
-	bool stable = false;
-	FragmentID point;
-	FragmentID pointStable;
-	FragmentID idle;
-	FragmentID grabStable;
-	FragmentID grab;
-	FragmentID fistStable;
-	FragmentID fist;
-
-	IActionPtr fistAction;
-	IActionPtr fistStableAction;
-	IActionPtr pointAction;
-	IActionPtr pointStableAction;
-	IActionPtr grabAction;
-	IActionPtr grabStableAction;
-	IActionPtr idleAction;
-	IActionController* mAction;
-	bool isIdle = false;
+	//Uncomment for use with animated mesh components
+	//bool isPointing = false;
+	//bool isFist = false;
+	//bool isGrabbed = false;
+	//bool stable = false;
+	//FragmentID point;
+	//FragmentID pointStable;
+	//FragmentID idle;
+	//FragmentID grabStable;
+	//FragmentID grab;
+	//FragmentID fistStable;
+	//FragmentID fist;
+ 	//IActionPtr fistAction;
+	//IActionPtr fistStableAction;
+	//IActionPtr pointAction;
+	//IActionPtr pointStableAction;
+	//IActionPtr grabAction;
+	//IActionPtr grabStableAction;
+	//IActionPtr idleAction;
+	//IActionController* mAction;
+	//bool isIdle = false;
 	Cry::DefaultComponents::CAdvancedAnimationComponent* m_pAnimationComponent = nullptr;
 
 };

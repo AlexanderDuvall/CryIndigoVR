@@ -22,7 +22,6 @@
 #include <CryPhysics/RayCastQueue.h>
 #include <vector> 
 #include "VRGrabbable.h"
-#include "VRLeftController.h"
 static void RegisterVRGrabbableComponent(Schematyc::IEnvRegistrar& registrar)
 {
 	Schematyc::CEnvRegistrationScope scope = registrar.Scope(IEntity::GetEntityScopeGUID());
@@ -36,19 +35,39 @@ static void RegisterVRGrabbableComponent(Schematyc::IEnvRegistrar& registrar)
 CRY_STATIC_AUTO_REGISTER_FUNCTION(&RegisterVRGrabbableComponent)
 
 /*
+returns if child is an extension or not
+*/
+bool VRGrabbable::isExtension() {
+	return VRGrabbable::isChildExtension;
+}
+/*
 * Confirms if the main varaible is the largest of the two
 * @main Variable to check
 * @s Variable to compare to
 * @d Variable to compare to
 @return
 */
-
 bool isLargestAxis(float main, float s, float d) {
 	if ((main == s && main == d) || (main >= s && main > d)) {
 		return true;
 	}
 	return false;
 }
+
+IEntity* VRGrabbable::getParent() {
+	if (isExtension()) {
+		return m_pEntity->GetParent();
+	}
+	else {
+		return m_pEntity;
+	}
+}
+
+
+bool VRGrabbable::isComponentActivated() {
+	return isActivated;
+}
+
 void VRGrabbable::Initialize() {
 
 }
@@ -62,7 +81,12 @@ Cry::Entity::EventFlags VRGrabbable::GetEventMask() const {
 }
 //Give back Quat 
 Quat VRGrabbable::getEntityAngleOffset(Ang3 handRotation, bool leftHand) {
-	//Cry::DefaultComponents::CRigidBodyComponent* rigid = m_pEntity->GetOrCreateComponent <Cry::DefaultComponents::CRigidBodyComponent>();
+	/// <summary>
+	///Do not print or bottleneck commands. For some reason printing all attributes before processing them rids everything of their values...
+	/// </summary>
+	/// <param name="handRotation"></param>
+	/// <param name="leftHand"></param>
+	/// <returns></returns>
 	if (leftHand) {
 		FinalOffset = (Ang3(
 			DEG2RAD(LeftXRota) + handRotation.x,
@@ -79,8 +103,9 @@ Quat VRGrabbable::getEntityAngleOffset(Ang3 handRotation, bool leftHand) {
 }
 Vec3 VRGrabbable::getEntityTransformOffset(bool isRightHand) {
 	if (isRightHand)
-		return Vec3(xTrans * -1.0f, yTrans, zTrans);
-	return Vec3(xTrans, yTrans, zTrans);
-
+		if (RightXTrans == -1 && RightYTrans == -1 && RightZTrans == -1)
+			return Vec3(LeftXTrans * -1.0f, LeftYTrans, LeftZTrans);
+		else
+			return Vec3(RightXTrans, RightYTrans, RightZTrans);
+	return Vec3(LeftXTrans, LeftYTrans, LeftZTrans);
 }
-

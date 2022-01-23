@@ -34,7 +34,7 @@ public:
 	static void initializeSteam();
 
  	int m_iAppID; // Our current AppID
-	bool m_bInitialized; // Have we called Request stats and received the callback?
+	bool m_bInitialized = false; // Have we called Request stats and received the callback?
 	Achievement_t* m_pAchievements; // Achievements data
 	int m_iNumAchievements; // The number of Achievements
 	STEAM_CALLBACK(CSteamAchievements, OnUserStatsReceived, UserStatsReceived_t,

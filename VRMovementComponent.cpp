@@ -22,10 +22,13 @@
 #include <CryPhysics/physinterface.h>
 Cry::DefaultComponents::CRigidBodyComponent* rigid;
 bool VRMovementComponent::canMove = true;
+Vec3 VRMovementComponent::largeCollider = Vec3(0.015, .05, 0.015);
+Vec3 VRMovementComponent::smallCollider = Vec3(0,0,0);
 struct Point {
 	double x;
 	double y;
 };
+
 //PLACE IN CORRECT SPOT ... INITIALIZE?
 void PhysicalizeLiving(IEntity& entity) {
 	SEntityPhysicalizeParams physParams;
@@ -85,6 +88,7 @@ void VRMovementComponent::Initialize() {
 	mainCamera = gEnv->pSystem->GetViewCamera();
 	CameraEntity = gEnv->pEntitySystem->FindEntityByName("HMD Cam");
 	m_pAudioListenerComponent = m_pEntity->GetOrCreateComponent<Cry::Audio::DefaultComponents::CListenerComponent>();
+
 }
 void VRMovementComponent::ProcessEvent(const SEntityEvent& event) {
 	if (event.event == ENTITY_EVENT_UPDATE)

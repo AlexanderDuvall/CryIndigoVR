@@ -42,26 +42,26 @@ public:
 	static float angz;
 	void MoveLiving(IPhysicalEntity&, Matrix34);
 private:
-	bool isPointing = false;
-	bool isFist = false;
-	bool isGrabbed = false;
-	bool stable = false;
-	FragmentID point;
-	FragmentID pointStable;
-	FragmentID idle;
-	FragmentID grabStable;
-	FragmentID grab;
-	FragmentID fistStable;
-	FragmentID fist;
-
-	IActionPtr fistAction;
-	IActionPtr fistStableAction;
-	IActionPtr pointAction;
-	IActionPtr pointStableAction;
-	IActionPtr grabAction;
-	IActionPtr grabStableAction;
-	IActionPtr idleAction;
-	IActionController* mAction;
+	//bool isPointing = false;
+	//bool isFist = false;
+	//bool isGrabbed = false;
+	//bool stable = false;
+	//FragmentID point;
+	//FragmentID pointStable;
+	//FragmentID idle;
+	//FragmentID grabStable;
+	//FragmentID grab;
+	//FragmentID fistStable;
+	//FragmentID fist;
+	//
+	//IActionPtr fistAction;
+	//IActionPtr fistStableAction;
+	//IActionPtr pointAction;
+	//IActionPtr pointStableAction;
+	//IActionPtr grabAction;
+	//IActionPtr grabStableAction;
+	//IActionPtr idleAction;
+	//IActionController* mAction;
 	bool isIdle = false;
 	Cry::DefaultComponents::CAdvancedAnimationComponent* m_pAnimationComponent = nullptr;
 
